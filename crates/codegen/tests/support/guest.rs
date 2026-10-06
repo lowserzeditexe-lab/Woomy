@@ -11,6 +11,8 @@ fn caller(entry: u32, targets: &[u32]) -> Vec<u32> {
     words.extend([0x80010024, 0x7c0803a6, 0x38210020, 0x4e800020]);
     words
 }
+// Used by the example target always and by Windows-only native tests.
+#[allow(dead_code)]
 pub fn names() -> Vec<&'static str> {
     vec![
         "direct",
@@ -171,6 +173,7 @@ pub fn fixture(name: &str) -> (Program, BTreeMap<u32, u32>) {
         raw,
     )
 }
+#[allow(dead_code)]
 pub fn states(
     program: &Program,
     raw: &BTreeMap<u32, u32>,
