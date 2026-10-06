@@ -1,7 +1,7 @@
 mod support;
-use woomy_codegen::{compiler::NativeCompiler, generate};
 #[cfg(windows)]
 use woomy_codegen::validation;
+use woomy_codegen::{compiler::NativeCompiler, generate};
 
 #[test]
 fn deterministic_ir_only_emission_and_unsupported_diagnostics() {
