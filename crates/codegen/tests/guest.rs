@@ -1,6 +1,8 @@
 #[path = "support/guest.rs"]
 mod guest;
-use woomy_codegen::{compiler::NativeCompiler, generate_program, validation};
+use woomy_codegen::generate_program;
+#[cfg(windows)]
+use woomy_codegen::{compiler::NativeCompiler, validation};
 #[test]
 #[cfg(windows)]
 fn multi_function_native_preserves_complete_shared_state() {

@@ -75,6 +75,7 @@ pub fn programs() -> Vec<(&'static str, Vec<u32>)> {
     programs.push(("branch_options", bo_cases));
     programs
 }
+#[allow(dead_code)]
 pub fn fixture_for(name: &str, words: &[u32]) -> (Function, BTreeMap<u32, u32>) {
     if name != "relocation_ha" && name != "relocation_hi" {
         return fixture(words);
@@ -143,6 +144,7 @@ pub fn fixture_for(name: &str, words: &[u32]) -> (Function, BTreeMap<u32, u32>) 
     );
     (ir, raw)
 }
+#[allow(dead_code)]
 pub fn states(count: usize) -> Vec<(Machine, usize)> {
     let mut seed = 0x76543210u32;
     (0..count)
