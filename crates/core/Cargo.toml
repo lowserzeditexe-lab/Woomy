@@ -1,0 +1,27 @@
+[package]
+name = "woomy-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+[dependencies]
+woomy-binary = { path = "../binary" }
+woomy-ppc = { path = "../ppc" }
+woomy-ir = { path = "../ir" }
+woomy-codegen = { path = "../codegen" }
+manmenmi = { package = "woomy-manmenmi", path = "../manmenmi" }
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+toml = "0.8"
+rusqlite = { version = "0.32", features = ["bundled"] }
+walkdir = "2"
+roxmltree = "0.20"
+fs2 = "0.4"
+tempfile.workspace = true
+[target.'cfg(windows)'.dependencies]
+winapi-util = "0.1"
+[dev-dependencies]
+proptest.workspace = true
+[lints]
+workspace = true

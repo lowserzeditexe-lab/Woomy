@@ -1,0 +1,20 @@
+[package]
+name = "woomy-ai"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+[dependencies]
+woomy-core = { path = "../core" }
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
+zeroize = "1"
+rusqlite = "0.32"
+[target.'cfg(windows)'.dependencies]
+keyring = { version = "3", features = ["windows-native"] }
+[dev-dependencies]
+tempfile.workspace = true
+[lints]
+workspace = true

@@ -1,0 +1,44 @@
+[package]
+name = "woomy-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+[package.metadata]
+cargo-fuzz = true
+[dependencies]
+libfuzzer-sys = "0.4"
+woomy-binary = { path = "../crates/binary" }
+woomy-ppc = { path = "../crates/ppc" }
+woomy-core = { path = "../crates/core" }
+[workspace]
+members = ["."]
+[[bin]]
+name = "rpx_parser"
+path = "fuzz_targets/rpx_parser.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "cafe_image"
+path = "fuzz_targets/cafe_image.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "reference_snapshot"
+path = "fuzz_targets/reference_snapshot.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "ppc_decoder"
+path = "fuzz_targets/ppc_decoder.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "cfg_builder"
+path = "fuzz_targets/cfg_builder.rs"
+test = false
+doc = false
+bench = false

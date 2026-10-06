@@ -1,0 +1,56 @@
+//! Reproducible synthetic fixtures only. Never reads or executes game functions.
+#[path = "../tests/support/guest.rs"]
+mod support;
+use std::path::PathBuf;
+use woomy_codegen::{compiler::NativeCompiler, generate_program, validation};
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let directory = std::env::args_os()
+        .nth(1)
+        .map(PathBuf::from)
+        .ok_or("usage: validate_guest <owned-output-directory>")?;
+    std::fs::create_dir_all(&directory)?;
+    let compiler = NativeCompiler::detect()?;
+    let mut fixtures = Vec::new();
+    let mut matched = 0;
+    let mut total = 0;
+    for name in support::names() {
+        let (program, raw) = support::fixture(name);
+        let generated = generate_program(&program)?;
+        let source = generated.source.ok_or("CODEGEN_UNSUPPORTED")?;
+        std::fs::write(directory.join(format!("{name}.cpp")), &source)?;
+        let build = compiler.build(&source, &directory)?;
+        std::fs::write(
+            directory.join(format!("{name}.build.json")),
+            serde_json::to_vec_pretty(&build.record)?,
+        )?;
+        let exe = directory.join(format!("{name}.exe"));
+        std::fs::write(&exe, build.executable.ok_or("COMPILER_ERROR")?)?;
+        let inputs = support::states(&program, &raw, name, 512);
+        let native = validation::run(&exe, &inputs)?;
+        let mut cases = Vec::new();
+        for (index, ((initial, budget), native)) in
+            inputs.into_iter().zip(native.executions).enumerate()
+        {
+            let report =
+                validation::compare_program(&program, &raw, initial.clone(), budget, native);
+            total += 1;
+            matched += usize::from(report.status == "MATCH");
+            cases.push(serde_json::json!({"case":index,"initial":initial,"budget":budget,"comparison":report}));
+        }
+        fixtures.push(serde_json::json!({"fixture":name,"program":program,"source_words":raw,"manifest":generated.manifest,"build":build.record,"process":native.process,"cases":cases}));
+    }
+    std::fs::write(
+        directory.join("report.json"),
+        serde_json::to_vec(
+            &serde_json::json!({"scope":"Synthetic fixtures only; no game semantic validation","validation_version":woomy_codegen::NATIVE_VALIDATION_VERSION,"seed":0x13579bdfu32,"total":total,"matched":matched,"fixtures":fixtures}),
+        )?,
+    )?;
+    println!(
+        "Synthetic multi-function PPC == IR == Native: {matched}/{total} MATCH; {}",
+        directory.join("report.json").display()
+    );
+    if matched != total {
+        return Err("native semantic mismatch".into());
+    }
+    Ok(())
+}

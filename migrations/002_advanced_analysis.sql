@@ -1,0 +1,13 @@
+CREATE TABLE dataflow_runs(function TEXT PRIMARY KEY REFERENCES functions(id) ON DELETE CASCADE, analysis_version INTEGER NOT NULL, converged INTEGER NOT NULL, steps INTEGER NOT NULL, status TEXT NOT NULL);
+CREATE TABLE register_values(function TEXT NOT NULL REFERENCES functions(id) ON DELETE CASCADE, address INTEGER NOT NULL, register TEXT NOT NULL, kind TEXT NOT NULL, value TEXT NOT NULL, provenance TEXT NOT NULL, rule TEXT NOT NULL, PRIMARY KEY(function,address,register));
+CREATE TABLE reaching_definitions(function TEXT NOT NULL REFERENCES functions(id) ON DELETE CASCADE, use_address INTEGER NOT NULL, register TEXT NOT NULL, definition_address INTEGER NOT NULL, kind TEXT NOT NULL, PRIMARY KEY(function,use_address,register,definition_address,kind));
+CREATE INDEX reaching_definition_source ON reaching_definitions(function,definition_address);
+ALTER TABLE indirect_sites ADD COLUMN source_register TEXT NOT NULL DEFAULT 'UNKNOWN';
+ALTER TABLE indirect_sites ADD COLUMN analysis_version INTEGER NOT NULL DEFAULT 1;
+ALTER TABLE indirect_sites ADD COLUMN is_return INTEGER NOT NULL DEFAULT 0;
+CREATE TABLE indirect_targets(function TEXT NOT NULL, site INTEGER NOT NULL, ordinal INTEGER NOT NULL, kind TEXT NOT NULL, target_module TEXT, address INTEGER, library TEXT, symbol TEXT, evidence TEXT NOT NULL, PRIMARY KEY(function,site,ordinal), FOREIGN KEY(function,site) REFERENCES indirect_sites(function,address) ON DELETE CASCADE);
+ALTER TABLE jump_tables ADD COLUMN function TEXT REFERENCES functions(id) ON DELETE CASCADE;
+ALTER TABLE jump_tables ADD COLUMN site INTEGER;
+ALTER TABLE jump_tables ADD COLUMN section INTEGER;
+ALTER TABLE jump_tables ADD COLUMN default_target INTEGER;
+CREATE TABLE jump_table_evidence(table_id TEXT NOT NULL REFERENCES jump_tables(id) ON DELETE CASCADE, ordinal INTEGER NOT NULL, kind TEXT NOT NULL, source INTEGER, detail TEXT NOT NULL, PRIMARY KEY(table_id,ordinal));
